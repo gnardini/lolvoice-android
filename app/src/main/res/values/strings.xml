@@ -1,0 +1,16 @@
+<resources>
+
+    <!-- General -->
+    <string name="app_name">LoL Voice</string>
+
+    <!-- Summoner Selection -->
+    <string name="new_summoner">Summoner Name:</string>
+    <string name="summoner_name">Summoner</string>
+    <string name="invalid_name">Invalid Summoner Name</string>
+    <string name="random_summoner">Random Summoner</string>
+
+    <!-- Home -->
+    <string name="talk">Give Command!</string>
+    <string name="speak">Speak Now!</string>
+
+</resources>
