@@ -76,7 +76,12 @@ public class SummonerSelectionFragment extends BaseFragment {
                     @Override
                     public void perform(Summoner summoner) {
                         mSummonersList.add(new SummonerInfo(summoner));
-                        mSummonerAdapter.notifyDataSetChanged();
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mSummonerAdapter.notifyDataSetChanged();
+                            }
+                        });
                     }
                 }, mNewSummoner.getText().toString());
             }

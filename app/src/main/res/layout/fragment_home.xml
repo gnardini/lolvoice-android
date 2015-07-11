@@ -11,54 +11,204 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.5"
+            android:layout_weight="0.7"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
-            <include android:id="@+id/champion_1"
+            <LinearLayout
+                android:id="@+id/champion_1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.2"
-                layout="@layout/champion_portrait" />
+                android:paddingLeft="1dp"
+                android:paddingRight="1dp"
+                android:orientation="vertical">
 
-            <include android:id="@+id/champion_2"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                layout="@layout/champion_portrait" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center"
+                    android:text="@string/top"
+                    android:textAllCaps="true"
+                    android:textColor="@color/dark_gray"
+                    android:background="@color/yellow"/>
 
-            <include android:id="@+id/champion_3"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                layout="@layout/champion_portrait" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingTop="1dp"
+                    android:paddingBottom="1dp" >
 
-            <include android:id="@+id/champion_4"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                layout="@layout/champion_portrait" />
+                    <include layout="@layout/champion_portrait" />
 
-            <include android:id="@+id/champion_5"
+                </FrameLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:background="@drawable/indicator"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/champion_2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.2"
-                layout="@layout/champion_portrait" />
+                android:paddingLeft="1dp"
+                android:paddingRight="1dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center"
+                    android:text="@string/jg"
+                    android:textAllCaps="true"
+                    android:textColor="@color/dark_gray"
+                    android:background="@color/orange"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingTop="1dp"
+                    android:paddingBottom="1dp" >
+
+                    <include layout="@layout/champion_portrait" />
+
+                </FrameLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:background="@drawable/indicator"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/champion_3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:paddingLeft="1dp"
+                android:paddingRight="1dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center"
+                    android:text="@string/mid"
+                    android:textAllCaps="true"
+                    android:textColor="@color/dark_gray"
+                    android:background="@color/blue"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingTop="1dp"
+                    android:paddingBottom="1dp" >
+
+                    <include layout="@layout/champion_portrait" />
+
+                </FrameLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:background="@drawable/indicator"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/champion_4"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:paddingLeft="1dp"
+                android:paddingRight="1dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center"
+                    android:text="@string/adc"
+                    android:textAllCaps="true"
+                    android:textColor="@color/dark_gray"
+                    android:background="@color/red"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingTop="1dp"
+                    android:paddingBottom="1dp" >
+
+                    <include layout="@layout/champion_portrait" />
+
+                </FrameLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:background="@drawable/indicator"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/champion_5"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:paddingLeft="1dp"
+                android:paddingRight="1dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center"
+                    android:text="@string/support"
+                    android:textAllCaps="true"
+                    android:textColor="@color/dark_gray"
+                    android:background="@color/green"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingTop="1dp"
+                    android:paddingBottom="1dp" >
+
+                    <include layout="@layout/champion_portrait" />
+
+                </FrameLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:background="@drawable/indicator"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.5">
+            android:layout_weight="0.3">
 
             <FrameLayout
                 android:id="@+id/current_game_speak"
                 android:layout_width="400dp"
-                android:layout_height="100dp"
+                android:layout_height="70dp"
                 android:layout_gravity="center"
                 android:background="@drawable/pressable_white_border">
 
@@ -81,7 +231,8 @@
         android:id="@+id/current_game_loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/translucent_black"
+        android:background="@color/translucent_dark_black"
+        android:clickable="true"
         android:visibility="gone">
 
         <ProgressBar

@@ -19,7 +19,8 @@ public class SummonerSelectionActivity extends BaseActivity {
 
     @Override
     protected void init() {
-        replaceFragment(com.android.lolvoice.R.id.summoner_selection_container, SummonerSelectionFragment.newInstance());
+        replaceFragment(com.android.lolvoice.R.id.summoner_selection_container,
+                SummonerSelectionFragment.newInstance());
     }
 
     @Override

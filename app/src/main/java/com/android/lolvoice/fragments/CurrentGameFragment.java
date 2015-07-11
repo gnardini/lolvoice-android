@@ -6,25 +6,26 @@ import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.View;
 
-import com.android.lolvoice.utils.CurrentGameUtils;
-import com.facebook.drawee.view.SimpleDraweeView;
+import com.android.lolvoice.Configuration;
+import com.android.lolvoice.R;
 import com.android.lolvoice.activities.HomeActivity;
 import com.android.lolvoice.services.Callback;
 import com.android.lolvoice.utils.ChampionsUtils;
+import com.android.lolvoice.utils.CurrentGameUtils;
+import com.android.lolvoice.utils.SummonerUtils;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.robrua.orianna.api.core.RiotAPI;
 import com.robrua.orianna.type.core.currentgame.CurrentGame;
-import com.robrua.orianna.type.core.currentgame.Participant;
 import com.robrua.orianna.type.core.staticdata.Champion;
+import com.robrua.orianna.type.core.staticdata.SummonerSpell;
+import com.robrua.orianna.type.dto.currentgame.Participant;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.android.lolvoice.Configuration;
-import com.android.lolvoice.utils.SummonerUtils;
-
 public class CurrentGameFragment extends BaseFragment {
 
     private static final int CHAMPION_COUNT = 5;
-    private static final int ULT = 3;
     private static final String CHAMPION = "champion_";
     private static final String ID = "id";
 
@@ -32,6 +33,7 @@ public class CurrentGameFragment extends BaseFragment {
     private View mLoadingView;
     private int mLoading;
     private List<ChampionPortrait> mChampionPortraits;
+    private Integer mSelectedRole;
 
     public static CurrentGameFragment newInstance() {
         CurrentGameFragment f = new CurrentGameFragment();
@@ -40,23 +42,26 @@ public class CurrentGameFragment extends BaseFragment {
 
     @Override
     protected int layout() {
-        return com.android.lolvoice.R.layout.fragment_home;
+        return R.layout.fragment_home;
     }
 
     @Override
     protected void setUi(View v) {
-        mSpeak = v.findViewById(com.android.lolvoice.R.id.current_game_speak);
-        mLoadingView = v.findViewById(com.android.lolvoice.R.id.current_game_loading);
+        mSpeak = v.findViewById(R.id.current_game_speak);
+        mLoadingView = v.findViewById(R.id.current_game_loading);
         mChampionPortraits = new ArrayList<>(CHAMPION_COUNT);
         for (int i = 0 ; i < CHAMPION_COUNT ; i++) {
             int championId = getResources().getIdentifier(CHAMPION + (i + 1), ID,
                     getActivity().getPackageName());
-            View champion = v.findViewById(championId);
             ChampionPortrait portrait = new ChampionPortrait();
-            portrait.mChampionImage = (SimpleDraweeView) champion.findViewById(com.android.lolvoice.R.id.champion_image);
-            portrait.mSpell1 = (SimpleDraweeView) champion.findViewById(com.android.lolvoice.R.id.champion_spell_1);
-            portrait.mSpell2 = (SimpleDraweeView) champion.findViewById(com.android.lolvoice.R.id.champion_spell_2);
-            portrait.mUlt = (SimpleDraweeView) champion.findViewById(com.android.lolvoice.R.id.champion_ult);
+            portrait.mFrame = v.findViewById(championId);
+            portrait.mFrame.setTag(i);
+            portrait.mChampionImage =
+                    (SimpleDraweeView) portrait.mFrame.findViewById(R.id.champion_image);
+            portrait.mSpell1 =
+                    (SimpleDraweeView) portrait.mFrame.findViewById(R.id.champion_spell_1);
+            portrait.mSpell2 =
+                    (SimpleDraweeView) portrait.mFrame.findViewById(R.id.champion_spell_2);
             mChampionPortraits.add(portrait);
         }
     }
@@ -84,7 +89,7 @@ public class CurrentGameFragment extends BaseFragment {
                             }
                         });
                     } else {
-                        loadChampionImages(getEnemies(CurrentGameUtils.getCurrentGame(),null));
+                        loadChampionImages(getEnemies(CurrentGameUtils.getCurrentGame(), null));
                     }
                 }
 
@@ -92,16 +97,16 @@ public class CurrentGameFragment extends BaseFragment {
 
             private long getPlayerTeamId(List<Participant> players, String summoner) {
                 for (Participant player : players)
-                    if (player.getSummoner().getName().equals(summoner))
-                        return player.getTeam().getID();
-                return players.get(0).getTeam().getID();
+                    if (player.getSummonerName().equals(summoner))
+                        return player.getTeamId();
+                return players.get(0).getTeamId();
             }
 
             private List<Participant> getEnemies(CurrentGame currentGame, String summonerName) {
                 List<Participant> enemies = new ArrayList<Participant>();
-                long teamId = getPlayerTeamId(currentGame.getParticipants(), summonerName);
-                for (Participant player : currentGame.getParticipants())
-                    if (player.getTeam().getID() != teamId)
+                long teamId = getPlayerTeamId(currentGame.getDto().getParticipants(), summonerName);
+                for (Participant player : currentGame.getDto().getParticipants())
+                    if (player.getTeamId() != teamId)
                         enemies.add(player);
                 return enemies;
             }
@@ -120,6 +125,33 @@ public class CurrentGameFragment extends BaseFragment {
                 startActivityForResult(intent, HomeActivity.SPEECH_REQUEST_CODE);
             }
         });
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mSelectedRole == null) {
+                    mSelectedRole = (int) v.getTag();
+                    mChampionPortraits.get(mSelectedRole).mFrame.setSelected(true);
+                } else {
+                    int newSelected = (int) v.getTag();
+                    if (newSelected != mSelectedRole) {
+                        ChampionPortrait portrait1 = mChampionPortraits.get(mSelectedRole);
+                        ChampionPortrait portrait2 = mChampionPortraits.get(newSelected);
+                        Champion champion = portrait1.mChampion;
+                        Participant participant = portrait1.mParticipant;
+                        portrait1.mChampion = portrait2.mChampion;
+                        portrait1.mParticipant = portrait2.mParticipant;
+                        portrait2.mChampion = champion;
+                        portrait2.mParticipant = participant;
+                        loadChampionData(portrait1);
+                        loadChampionData(portrait2);
+                    }
+                    mChampionPortraits.get(mSelectedRole).mFrame.setSelected(false);
+                    mSelectedRole = null;
+                }
+            }
+        };
+        for (ChampionPortrait portrait : mChampionPortraits)
+            portrait.mFrame.setOnClickListener(listener);
     }
 
     private void loadChampionImages(final List<Participant> players) {
@@ -127,25 +159,30 @@ public class CurrentGameFragment extends BaseFragment {
             @Override
             public void run() {
                 mLoadingView.setVisibility(View.GONE);
-                for (int i = 0 ; i < mChampionPortraits.size() ; i++) {
+                for (int i = 0; i < mChampionPortraits.size(); i++) {
                     ChampionPortrait portrait = mChampionPortraits.get(i);
-                    Participant player = players.get(i);
-                    portrait.mChampion = player.getChampion();
-                    portrait.mChampionImage.setImageURI(Uri.parse(Configuration.IMAGES_URL
-                            + portrait.mChampion.getImage().getGroup() + "/"
-                            + portrait.mChampion.getImage().getFull()));
-                    portrait.mSpell1.setImageURI(Uri.parse(Configuration.IMAGES_URL
-                            + player.getSummonerSpell1().getImage().getGroup() + "/"
-                            + player.getSummonerSpell1().getImage().getFull()));
-                    portrait.mSpell2.setImageURI(Uri.parse(Configuration.IMAGES_URL
-                            + player.getSummonerSpell2().getImage().getGroup() + "/"
-                            + player.getSummonerSpell2().getImage().getFull()));
-                    portrait.mUlt.setImageURI(Uri.parse(Configuration.IMAGES_URL
-                            + portrait.mChampion.getSpells().get(ULT).getImage().getGroup() + "/"
-                            + portrait.mChampion.getSpells().get(ULT).getImage().getFull()));
+                    portrait.mParticipant = players.get(i);
+                    portrait.mChampion = ChampionsUtils.getChampionById(
+                            (int)((long) portrait.mParticipant.getChampionId()));
+                    loadChampionData(portrait);
                 }
             }
         });
+    }
+
+    private void loadChampionData(ChampionPortrait portrait) {
+        Participant player = portrait.mParticipant;
+        portrait.mChampionImage.setImageURI(Uri.parse(Configuration.IMAGES_URL
+                + portrait.mChampion.getImage().getGroup() + "/"
+                + portrait.mChampion.getImage().getFull()));
+        SummonerSpell spell = RiotAPI.getSummonerSpell(player.getSpell1Id());
+        portrait.mSpell1.setImageURI(Uri.parse(Configuration.IMAGES_URL
+                + spell.getImage().getGroup() + "/"
+                + spell.getImage().getFull()));
+        spell = RiotAPI.getSummonerSpell(player.getSpell2Id());
+        portrait.mSpell2.setImageURI(Uri.parse(Configuration.IMAGES_URL
+                + spell.getImage().getGroup() + "/"
+                + spell.getImage().getFull()));
     }
 
     public void onSpeachResults(List<String> results) {
@@ -157,9 +194,10 @@ public class CurrentGameFragment extends BaseFragment {
     private class ChampionPortrait {
 
         Champion mChampion;
+        Participant mParticipant;
+        View mFrame;
         SimpleDraweeView mChampionImage;
         SimpleDraweeView mSpell1;
         SimpleDraweeView mSpell2;
-        SimpleDraweeView mUlt;
     }
 }

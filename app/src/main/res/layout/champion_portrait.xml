@@ -3,8 +3,6 @@
     android:id="@+id/champion"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="5dp"
-    android:layout_marginRight="5dp"
     android:orientation="vertical">
 
     <com.facebook.drawee.view.SimpleDraweeView
@@ -17,29 +15,22 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.3"
-        android:orientation="horizontal"
-        android:weightSum="0.9">
+        android:layout_marginTop="2dp"
+        android:orientation="horizontal">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/champion_spell_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.3"
-            android:scaleType="fitXY"/>
+            android:layout_weight="0.5"
+            android:layout_marginRight="1dp"/>
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/champion_spell_2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.3"
-            android:scaleType="fitXY"/>
-
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/champion_ult"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.3"
-            android:scaleType="fitXY"/>
+            android:layout_weight="0.5"
+            android:layout_marginLeft="1dp"/>
 
     </LinearLayout>
 

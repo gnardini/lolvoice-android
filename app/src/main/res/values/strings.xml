@@ -8,9 +8,15 @@
     <string name="summoner_name">Summoner</string>
     <string name="invalid_name">Invalid Summoner Name</string>
     <string name="random_summoner">Random Summoner</string>
+    <string name="summoner_selection">Summoner Selection</string>
 
     <!-- Home -->
     <string name="talk">Give Command!</string>
     <string name="speak">Speak Now!</string>
+    <string name="top">Top</string>
+    <string name="jg">Jungle</string>
+    <string name="mid">Mid</string>
+    <string name="adc">ADC</string>
+    <string name="support">Support</string>
 
 </resources>

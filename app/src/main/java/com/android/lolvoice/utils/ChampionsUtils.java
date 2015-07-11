@@ -1,6 +1,5 @@
 package com.android.lolvoice.utils;
 
-import com.android.lolvoice.models.ChampionInfo;
 import com.android.lolvoice.services.Callback;
 import com.robrua.orianna.api.core.AsyncRiotAPI;
 import com.robrua.orianna.type.api.Action;
@@ -15,9 +14,9 @@ import java.util.Map;
 
 public class ChampionsUtils {
 
-    public static Map<Integer, ChampionInfo> sChampions;
+    public static Map<Integer, Champion> sChampions;
 
-    public static ChampionInfo getChampionById(int id) {
+    public static Champion getChampionById(int id) {
         return sChampions.get(id);
     }
 
@@ -31,7 +30,7 @@ public class ChampionsUtils {
             @Override
             public void perform(List<Champion> champions) {
                 for (Champion champion : champions)
-                    sChampions.put((int) champion.getID(), new ChampionInfo(champion));
+                    sChampions.put((int) champion.getID(), champion);
                 callback.callback(null);
             }
         });
