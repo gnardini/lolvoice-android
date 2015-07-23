@@ -3,6 +3,7 @@ package com.android.lolvoice;
 
 import android.content.Context;
 
+import com.android.lolvoice.utils.ChampionsUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.orm.SugarApp;
 import com.robrua.orianna.api.core.AsyncRiotAPI;
@@ -22,6 +23,7 @@ public class LoLVoiceApplication extends SugarApp {
         AsyncRiotAPI.setRegion(Region.LAS);
         AsyncRiotAPI.setAPIKey(Configuration.API_KEY);
         AsyncRiotAPI.setLoadPolicy(LoadPolicy.LAZY);
+        ChampionsUtils.loadChampions();
     }
 
     public static Context getAppContext() {

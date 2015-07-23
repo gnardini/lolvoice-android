@@ -7,12 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import butterknife.ButterKnife;
+
 public abstract class BaseFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(layout(), container, false);
+        ButterKnife.bind(this, v);
         setUi(v);
         init();
         populate();
@@ -20,15 +23,21 @@ public abstract class BaseFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onDestroyView() {
+        ButterKnife.unbind(this);
+        super.onDestroyView();
+    }
+
     protected abstract int layout();
 
-    protected abstract void setUi(View v);
+    protected void setUi(View v){}
 
-    protected abstract void init();
+    protected void init(){}
 
-    protected abstract void populate();
+    protected void populate(){}
 
-    protected abstract void setListeners();
+    protected void setListeners(){}
 
     protected void showToast(int resId) {
         Toast.makeText(getActivity(), resId, Toast.LENGTH_SHORT).show();

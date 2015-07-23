@@ -8,20 +8,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@color/soft_white">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/summoner_selection"
-                android:textSize="20dp"
-                android:textColor="@color/dark_gray"/>
-
-        </FrameLayout>
+        <include layout="@layout/toolbar" />
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -52,7 +39,7 @@
         </FrameLayout>
 
         <ListView
-            android:id="@+id/collection_view"
+            android:id="@+id/summoner_selection_listview"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -80,5 +67,43 @@
         </FrameLayout>
 
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/summoner_selection_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:background="@color/translucent_dark_black"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_gravity="center"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:background="@color/white"
+            android:orientation="horizontal">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:id="@+id/summoner_selection_loading_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="16sp"
+                android:textColor="@color/dark_gray"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </FrameLayout>

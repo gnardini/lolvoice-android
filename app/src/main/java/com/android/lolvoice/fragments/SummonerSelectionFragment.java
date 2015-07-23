@@ -1,35 +1,41 @@
 package com.android.lolvoice.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
-import com.android.lolvoice.activities.HomeActivity;
+import com.android.lolvoice.R;
 import com.android.lolvoice.adapters.SummonersAdapter;
+import com.android.lolvoice.listeners.CurrentGameLoadingListener;
 import com.android.lolvoice.models.SummonerInfo;
 import com.android.lolvoice.utils.CurrentGameUtils;
 import com.android.lolvoice.utils.SummonerUtils;
 import com.robrua.orianna.api.core.AsyncRiotAPI;
 import com.robrua.orianna.type.api.Action;
-import com.robrua.orianna.type.core.currentgame.CurrentGame;
+import com.robrua.orianna.type.core.common.Region;
 import com.robrua.orianna.type.core.summoner.Summoner;
 import com.robrua.orianna.type.exception.APIException;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.OnClick;
 
-public class SummonerSelectionFragment extends BaseFragment {
+public class SummonerSelectionFragment extends BaseFragment implements CurrentGameLoadingListener {
 
-    private EditText mNewSummoner;
-    private View mAddSummoner;
-    private View mRandomSummoner;
-    private ListView mSummoners;
+    @Bind(R.id.summoner_selection_toolbar) Toolbar mToolbar;
+    @Bind(R.id.summoner_selection_new) EditText mNewSummoner;
+    @Bind(R.id.summoner_selection_listview) ListView mSummoners;
+    @Bind(R.id.summoner_selection_loading) View mLoading;
+    @Bind(R.id.summoner_selection_loading_text) TextView mLoadingText;
     private SummonersAdapter mSummonerAdapter;
     private List<SummonerInfo> mSummonersList;
+    private boolean mStartGameOnLoad;
 
     public static SummonerSelectionFragment newInstance() {
         SummonerSelectionFragment fragment = new SummonerSelectionFragment();
@@ -40,74 +46,120 @@ public class SummonerSelectionFragment extends BaseFragment {
 
     @Override
     protected int layout() {
-        return com.android.lolvoice.R.layout.fragment_summoner_select;
-    }
-
-    @Override
-    protected void setUi(View v) {
-        mNewSummoner = (EditText) v.findViewById(com.android.lolvoice.R.id.summoner_selection_new);
-        mAddSummoner = v.findViewById(com.android.lolvoice.R.id.summoner_selection_send);
-        mSummoners = (ListView) v.findViewById(com.android.lolvoice.R.id.collection_view);
-        mRandomSummoner = v.findViewById(com.android.lolvoice.R.id.summoner_selection_random);
+        return R.layout.fragment_summoner_select;
     }
 
     @Override
     protected void populate() {
+        mToolbar.setTitle(R.string.summoner_selection);
     }
 
     @Override
     protected void init() {
-        mSummonersList = new LinkedList<SummonerInfo>(SummonerUtils.getStoredSummoners());
+        mSummonersList = new LinkedList<>(SummonerUtils.getStoredSummoners());
         mSummonerAdapter = new SummonersAdapter(getActivity(), mSummonersList);
         mSummoners.setAdapter(mSummonerAdapter);
     }
 
     @Override
     protected void setListeners() {
-        mAddSummoner.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AsyncRiotAPI.getSummonerByName(new Action<Summoner>() {
-                    @Override
-                    public void handle(APIException exception) {
-                        showToast(com.android.lolvoice.R.string.invalid_name);
-                    }
-
-                    @Override
-                    public void perform(Summoner summoner) {
-                        mSummonersList.add(new SummonerInfo(summoner));
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mSummonerAdapter.notifyDataSetChanged();
-                            }
-                        });
-                    }
-                }, mNewSummoner.getText().toString());
-            }
-        });
         mSummoners.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                SummonerUtils.setSummoner(mSummonersList.get(position));
-                getActivity().startActivity(new Intent(getActivity(), HomeActivity.class));
+                SummonerInfo summonerInfo = mSummonersList.get(position);
+                if (summonerInfo.getSummonerId() == 0) mStartGameOnLoad = true;
+                else startSummonerGame(summonerInfo);
             }
         });
-        mRandomSummoner.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AsyncRiotAPI.getFeaturedGames(new Action<List<CurrentGame>>() {
-                    @Override
-                    public void handle(APIException exception) {
-                    }
+    }
 
+    @OnClick(R.id.summoner_selection_send)
+    public void addSummoner() {
+        String summonerName = mNewSummoner.getText().toString();
+        if (summonerRepeated(summonerName)) return;
+        mNewSummoner.setText("");
+        final SummonerInfo summonerInfo = new SummonerInfo(summonerName, Region.LAS);
+        mSummonersList.add(summonerInfo);
+        mSummonerAdapter.notifyDataSetChanged();
+        AsyncRiotAPI.getSummonerByName(new Action<Summoner>() {
+            @Override
+            public void handle(APIException exception) {
+                mStartGameOnLoad = false;
+                mSummonersList.remove(summonerInfo);
+                getActivity().runOnUiThread(new Runnable() {
                     @Override
-                    public void perform(List<CurrentGame> responseData) {
-                        SummonerUtils.setSummoner(null);
-                        CurrentGameUtils.setCurrentGame(responseData.get(0));
-                        getActivity().startActivity(new Intent(getActivity(), HomeActivity.class));
+                    public void run() {
+                        showToast(R.string.invalid_name);
+                        mSummonerAdapter.notifyDataSetChanged();
                     }
                 });
+            }
+
+            @Override
+            public void perform(Summoner summoner) {
+                summonerInfo.setSummonerId(summoner.getID());
+                if (mStartGameOnLoad) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            startSummonerGame(summonerInfo);
+                        }
+                    });
+                }
+            }
+        }, summonerName);
+    }
+
+    private void startSummonerGame(SummonerInfo summonerInfo) {
+        startLoading();
+        SummonerUtils.setSummoner(summonerInfo);
+        CurrentGameUtils.startSummonerGame(getActivity(), this);
+    }
+
+    @OnClick(R.id.summoner_selection_random)
+    public void startRandomGame() {
+        startLoading();
+        CurrentGameUtils.startRandomGame(getActivity(), this);
+    }
+
+    private boolean summonerRepeated(String summonerName) {
+        for (SummonerInfo summoner : mSummonersList)
+            if (summoner.getName().equals(summonerName)) return true;
+        return false;
+    }
+
+    private void startLoading() {
+        mLoadingText.setText(R.string.summoner_selection_loading_game);
+        mLoading.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onGameLoaded() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mLoadingText.setText(R.string.summoner_selection_fetching_champion);
+            }
+        });
+    }
+
+    @Override
+    public void onChampionInfoLoaded() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mLoading.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    @Override
+    public void onLoadingFail() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mLoading.setVisibility(View.GONE);
+                showToast(R.string.summoner_selection_not_ranked_game);
             }
         });
     }
