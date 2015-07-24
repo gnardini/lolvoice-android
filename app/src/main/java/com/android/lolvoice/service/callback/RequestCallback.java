@@ -1,4 +1,4 @@
-package com.android.lolvoice.services;
+package com.android.lolvoice.service.callback;
 
 import android.content.Context;
 

@@ -21,8 +21,8 @@ import java.util.List;
 import com.android.lolvoice.listeners.DataClickableListener;
 import com.android.lolvoice.listeners.EndlessScrollListener;
 import com.android.lolvoice.listeners.OnDataClickedListener;
-import com.android.lolvoice.services.RequestCallback;
-import com.android.lolvoice.services.providers.ApiPagingProvider;
+import com.android.lolvoice.service.callback.RequestCallback;
+import com.android.lolvoice.service.providers.ApiPagingProvider;
 
 import retrofit.RetrofitError;
 import retrofit.client.Response;

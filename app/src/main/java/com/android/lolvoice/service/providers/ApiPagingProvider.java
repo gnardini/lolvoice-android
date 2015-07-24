@@ -1,9 +1,9 @@
-package com.android.lolvoice.services.providers;
+package com.android.lolvoice.service.providers;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.android.lolvoice.services.RequestCallback;
+import com.android.lolvoice.service.callback.RequestCallback;
 
 public abstract class ApiPagingProvider<T> {
 

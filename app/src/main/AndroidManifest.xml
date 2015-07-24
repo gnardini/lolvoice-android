@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:name=".LoLVoiceApplication"
@@ -28,6 +29,8 @@
             android:label="@string/app_name"
             android:screenOrientation="landscape">
         </activity>
+        <service android:name=".service.SpeechRecognitionService"
+            android:label="@string/app_name" />
     </application>
 
 </manifest>

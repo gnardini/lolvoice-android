@@ -1,4 +1,4 @@
-package com.android.lolvoice.services;
+package com.android.lolvoice.utils.serializer;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

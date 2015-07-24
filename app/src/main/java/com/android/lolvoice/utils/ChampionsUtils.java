@@ -2,6 +2,8 @@ package com.android.lolvoice.utils;
 
 import com.android.lolvoice.listeners.OnFinishLoadingListener;
 import com.android.lolvoice.models.ChampionInfo;
+import com.android.lolvoice.models.Role;
+import com.android.lolvoice.models.Spell;
 import com.android.lolvoice.models.SummonerSpellInfo;
 import com.robrua.orianna.api.core.AsyncRiotAPI;
 import com.robrua.orianna.type.api.Action;
@@ -14,6 +16,21 @@ import java.util.List;
 import java.util.Map;
 
 public class ChampionsUtils {
+
+    public static final int TOP = 0;
+    public static final int JG = 1;
+    public static final int MID = 2;
+    public static final int ADC = 3;
+    public static final int SUP = 4;
+
+    public static final int FLASH = 4;
+    public static final int IGNITE = 14;
+    public static final int TP = 12;
+    public static final int EXHAUST = 3;
+    public static final int GHOST = 6;
+    public static final int HEAL = 7;
+    public static final int CLEANSE = 1;
+    public static final int BARRIER = 21;
 
     private static Map<Integer, ChampionInfo> sChampions;
     private static Map<Integer, SummonerSpellInfo> sSummonerSpells;
@@ -89,8 +106,9 @@ public class ChampionsUtils {
                 for (Champion champion : champions)
                     sChampions.put((int) champion.getID(), new ChampionInfo(champion));
                 sChampionsLoading = false;
+                if (sListener != null && !sChampionsLoaded && sSummonerSpellsLoaded)
+                    sListener.onLoadingSuccess();
                 sChampionsLoaded = true;
-                if (sListener != null && sSummonerSpellsLoaded) sListener.onLoadingSuccess();
             }
         });
     }
@@ -112,9 +130,46 @@ public class ChampionsUtils {
                 for (SummonerSpell ss : summonerSpells)
                     sSummonerSpells.put((int) ss.getID(), new SummonerSpellInfo(ss));
                 sSummonerSpellsLoading = false;
+                if (sListener != null && !sSummonerSpellsLoaded && sChampionsLoaded)
+                    sListener.onLoadingSuccess();
                 sSummonerSpellsLoaded = true;
-                if (sListener != null && sChampionsLoaded) sListener.onLoadingSuccess();
             }
         });
+    }
+
+    public static Role getRole(int position) {
+        switch (position) {
+            case TOP: return Role.TOP;
+            case JG: return Role.JG;
+            case MID: return Role.MID;
+            case ADC: return Role.ADC;
+            case SUP: return Role.SUP;
+            default: return null;
+        }
+    }
+
+    public static int getRolePosition(Role role) {
+        switch (role) {
+            case TOP: return TOP;
+            case JG: return JG;
+            case MID: return MID;
+            case ADC: return ADC;
+            case SUP: return SUP;
+            default: return -1;
+        }
+    }
+
+    public static Spell getSpell(int position) {
+        switch (position) {
+            case FLASH: return Spell.FLASH;
+            case IGNITE: return Spell.IGNITE;
+            case TP: return Spell.TP;
+            case EXHAUST: return Spell.EXHAUST;
+            case GHOST: return Spell.GHOST;
+            case HEAL: return Spell.HEAL;
+            case CLEANSE: return Spell.CLEANSE;
+            case BARRIER: return Spell.BARRIER;
+            default: return null;
+        }
     }
 }

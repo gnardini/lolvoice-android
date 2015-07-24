@@ -3,21 +3,22 @@ package com.android.lolvoice.fragments;
 import android.content.Intent;
 import android.net.Uri;
 import android.speech.RecognizerIntent;
-import android.util.Log;
 import android.view.View;
 
 import com.android.lolvoice.Configuration;
 import com.android.lolvoice.R;
 import com.android.lolvoice.activities.CurrentGameActivity;
+import com.android.lolvoice.helper.CooldownsHelper;
 import com.android.lolvoice.models.ChampionInfo;
+import com.android.lolvoice.models.Role;
+import com.android.lolvoice.models.Spell;
 import com.android.lolvoice.models.SummonerSpellInfo;
+import com.android.lolvoice.models.event.SpeakEvent;
 import com.android.lolvoice.utils.ChampionsUtils;
 import com.android.lolvoice.utils.CurrentGameUtils;
 import com.android.lolvoice.utils.SummonerUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.robrua.orianna.api.core.RiotAPI;
 import com.robrua.orianna.type.core.currentgame.CurrentGame;
-import com.robrua.orianna.type.core.staticdata.SummonerSpell;
 import com.robrua.orianna.type.dto.currentgame.Participant;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import de.greenrobot.event.EventBus;
 
 public class CurrentGameFragment extends BaseFragment {
 
@@ -33,10 +35,10 @@ public class CurrentGameFragment extends BaseFragment {
     private static final String ID = "id";
 
     @Bind(R.id.current_game_speak) View mSpeak;
-    @Bind(R.id.current_game_loading) View mLoadingView;
-    private int mLoading;
     private List<ChampionPortrait> mChampionPortraits;
+    private CooldownsHelper mCooldownsHelper;
     private Integer mSelectedRole;
+    private Role mRequestedRole;
 
     public static CurrentGameFragment newInstance() {
         CurrentGameFragment f = new CurrentGameFragment();
@@ -64,6 +66,7 @@ public class CurrentGameFragment extends BaseFragment {
 
     @Override
     protected void init() {
+        super.init();
         CurrentGame currentGame = CurrentGameUtils.getCurrentGame();
         loadChampionImages(getEnemies(currentGame, SummonerUtils.getSummonerName()));
     }
@@ -89,10 +92,8 @@ public class CurrentGameFragment extends BaseFragment {
         mSpeak.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                startActivityForResult(intent, CurrentGameActivity.SPEECH_REQUEST_CODE);
+                if (mCooldownsHelper == null) startCooldownTracking();
+                requestRole();
             }
         });
         View.OnClickListener listener = new View.OnClickListener() {
@@ -128,7 +129,6 @@ public class CurrentGameFragment extends BaseFragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mLoadingView.setVisibility(View.GONE);
                 for (int i = 0; i < mChampionPortraits.size(); i++) {
                     ChampionPortrait portrait = mChampionPortraits.get(i);
                     portrait.mParticipant = players.get(i);
@@ -142,23 +142,64 @@ public class CurrentGameFragment extends BaseFragment {
 
     private void loadChampionData(ChampionPortrait portrait) {
         Participant player = portrait.mParticipant;
+        if (portrait.mChampion == null) {
+            return;
+        }
         portrait.mChampionImage.setImageURI(Uri.parse(Configuration.IMAGES_URL
                 + portrait.mChampion.getImageGroup() + "/"
                 + portrait.mChampion.getImageFull()));
-        SummonerSpellInfo spell = ChampionsUtils
-                .getSummonerSpellById((int)(long) player.getSpell1Id());
+        portrait.mSummonerSpell1 =
+                ChampionsUtils.getSummonerSpellById((int) (long) player.getSpell1Id());
         portrait.mSpell1.setImageURI(Uri.parse(Configuration.IMAGES_URL
-                + spell.getImageGroup() + "/"
-                + spell.getImageFull()));
-        spell = ChampionsUtils.getSummonerSpellById((int) (long) player.getSpell2Id());
+                + portrait.mSummonerSpell1.getImageGroup() + "/"
+                + portrait.mSummonerSpell1.getImageFull()));
+        portrait.mSummonerSpell2 =
+                ChampionsUtils.getSummonerSpellById((int) (long) player.getSpell2Id());
         portrait.mSpell2.setImageURI(Uri.parse(Configuration.IMAGES_URL
-                + spell.getImageGroup() + "/"
-                + spell.getImageFull()));
+                + portrait.mSummonerSpell2.getImageGroup() + "/"
+                + portrait.mSummonerSpell2.getImageFull()));
     }
 
-    public void onSpeachResults(List<String> results) {
-        for (String s : results) {
-            Log.e("Result: ", s);
+    private void startCooldownTracking() {
+        mCooldownsHelper = new CooldownsHelper();
+        for (int i = 0 ; i < Role.COUNT ; i++) {
+            ChampionPortrait portrait = mChampionPortraits.get(i);
+            mCooldownsHelper.setRole(ChampionsUtils.getRole(i),
+                    ChampionsUtils.getSpell(portrait.mSummonerSpell1.getSummonerSpellId()),
+                    ChampionsUtils.getSpell(portrait.mSummonerSpell2.getSummonerSpellId()));
+        }
+        mCooldownsHelper.start();
+    }
+
+    public void requestRole() {
+        EventBus.getDefault().post(new SpeakEvent("Name role"));
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        getActivity().startActivityForResult(intent, CurrentGameActivity.REQUEST_ROLE);
+    }
+
+    public void onRoleSelected(Role role) {
+        if (role == null) requestRole();
+        else {
+            mRequestedRole = role;
+            requestSpell();
+        }
+    }
+
+    public void requestSpell() {
+        EventBus.getDefault().post(new SpeakEvent("Name spell"));
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        getActivity().startActivityForResult(intent, CurrentGameActivity.REQUEST_SPELL);
+    }
+
+    public void onSpellSelected(Spell spell) {
+        if (spell == null) requestSpell();
+        else {
+            mCooldownsHelper.setCooldown(mRequestedRole, spell);
+            mRequestedRole = null;
         }
     }
 
@@ -166,6 +207,8 @@ public class CurrentGameFragment extends BaseFragment {
 
         ChampionInfo mChampion;
         Participant mParticipant;
+        SummonerSpellInfo mSummonerSpell1;
+        SummonerSpellInfo mSummonerSpell2;
         View mFrame;
         @Bind(R.id.champion_image) SimpleDraweeView mChampionImage;
         @Bind(R.id.champion_spell_1) SimpleDraweeView mSpell1;

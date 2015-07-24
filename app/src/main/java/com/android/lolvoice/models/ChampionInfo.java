@@ -14,7 +14,6 @@ public class ChampionInfo extends SugarRecord<ChampionInfo> {
     private String imageFull;
 
     public ChampionInfo() {
-
     }
 
     public ChampionInfo(Champion champion) {
