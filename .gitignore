@@ -28,4 +28,6 @@ proguard/
 # OSX
 .DS_Store
 
+*.iml
+
 Configuration.java
