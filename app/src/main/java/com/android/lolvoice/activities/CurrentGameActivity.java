@@ -4,13 +4,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 
-import java.util.List;
-
 import com.android.lolvoice.R;
 import com.android.lolvoice.fragments.CurrentGameFragment;
+import com.android.lolvoice.utils.TextToSpeechUtils;
+import com.android.lolvoice.models.event.SpeakEvent;
 import com.android.lolvoice.utils.SpeechRecognitionUtils;
 
-public class CurrentGameActivity extends TTSActivity {
+import java.util.List;
+
+import de.greenrobot.event.EventBus;
+
+public class CurrentGameActivity extends BaseActivity {
 
     public static final int REQUEST_ROLE = 10;
     public static final int REQUEST_SPELL = 11;
@@ -27,6 +31,7 @@ public class CurrentGameActivity extends TTSActivity {
         super.init();
         mCurrentGameFragment = CurrentGameFragment.newInstance();
         replaceFragment(R.id.home_activity_container, mCurrentGameFragment);
+        TextToSpeechUtils.onCreate(this);
     }
 
     @Override
@@ -43,15 +48,22 @@ public class CurrentGameActivity extends TTSActivity {
         }
     }
 
+    public void onEvent(SpeakEvent event) {
+        TextToSpeechUtils.speak(event.getText());
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //startService(new Intent(this, SpeechRecognitionService.class));
+        EventBus.getDefault().register(this);
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         //stopService(new Intent(this, SpeechRecognitionService.class));
+        TextToSpeechUtils.onDestroy();
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 }

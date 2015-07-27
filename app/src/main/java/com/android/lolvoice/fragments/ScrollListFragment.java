@@ -13,16 +13,16 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.android.lolvoice.listeners.DataClickableListener;
 import com.android.lolvoice.listeners.EndlessScrollListener;
 import com.android.lolvoice.listeners.OnDataClickedListener;
 import com.android.lolvoice.service.callback.RequestCallback;
 import com.android.lolvoice.service.providers.ApiPagingProvider;
+
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -223,15 +223,12 @@ public abstract class ScrollListFragment<T> extends BaseFragment
         }
         setStatusLoading();
         setAdapter();
-        if (!isNetworkAvailable()) {
-            loadOfflineData(currentPage);
-        } else {
-            mProvider.provide(ITEMS_PER_PAGE,
+        if (isNetworkAvailable()) {
+             mProvider.provide(ITEMS_PER_PAGE,
                     currentPage + 1,
                     new RequestCallback<List<T>>(getActivity()) {
                         @Override
                         public void success(List<T> list, Response response) {
-                            mProvider.saveOfflineData(list);
                             mRetryAmount = 0;
                             if (mOnDataReceivedTransformer != null) {
                                 list = mOnDataReceivedTransformer.transform(list);
@@ -258,17 +255,6 @@ public abstract class ScrollListFragment<T> extends BaseFragment
                     }
             );
         }
-    }
-
-    private void loadOfflineData(final int currentPage) {
-        List offlineList = mProvider.getOfflineData();
-        if (!offlineList.isEmpty() && currentPage == 0) {
-            mList.clear();
-            mList.addAll(offlineList);
-            mAdapter.notifyDataSetChanged();
-        }
-        if (mOfflineModeView != null) mOfflineModeView.setVisibility(View.VISIBLE);
-        setStatusLoaded();
     }
 
     protected void setAdapter(BaseAdapter adapter) {

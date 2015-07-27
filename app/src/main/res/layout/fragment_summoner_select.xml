@@ -22,10 +22,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingRight="30dp"
+                android:layout_gravity="center_vertical"
                 android:singleLine="true"
                 android:hint="@string/summoner_name"
                 android:textColor="@color/dark_gray"/>
-            
+<!--
+            <Spinner
+                android:id="@+id/summoner_selection_region"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:layout_gravity="center_vertical|right"
+                android:spinnerMode="dropdown"/>
+            -->
             <ImageView
                 android:id="@+id/summoner_selection_send"
                 android:layout_width="30dp"

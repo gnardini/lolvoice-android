@@ -7,9 +7,6 @@ import android.os.IBinder;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.util.Log;
-
-import com.android.lolvoice.utils.SpeechRecognitionUtils;
 
 import java.util.ArrayList;
 
@@ -23,7 +20,7 @@ public class SpeechRecognitionService extends Service implements RecognitionList
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e(TAG, "Created");
+       // Log.e(TAG, "Created");
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         mSpeechRecognizer.setRecognitionListener(this);
         mRegonizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -47,48 +44,48 @@ public class SpeechRecognitionService extends Service implements RecognitionList
 
     @Override
     public void onResults(Bundle results) {
-        Log.e(TAG, "Results");
+       // Log.e(TAG, "Results");
         ArrayList<String> matches = results
                 .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         StringBuilder text = new StringBuilder();
         for (String result : matches)
             text.append(result.toLowerCase() + " ");
-        Log.e(TAG, text.toString());
+        //Log.e(TAG, text.toString());
     }
 
     @Override
     public void onEndOfSpeech() {
-        Log.e(TAG, "End of Speech");
+        //Log.e(TAG, "End of Speech");
     }
 
     @Override
     public void onReadyForSpeech(Bundle params) {
-        Log.e(TAG, "Ready for speech");
+        //Log.e(TAG, "Ready for speech");
     }
 
     @Override
     public void onBeginningOfSpeech() {
-        Log.e(TAG, "Beggining");
+        //Log.e(TAG, "Beggining");
     }
 
     @Override
     public void onPartialResults(Bundle partialResults) {
-        Log.e(TAG, "Partial results");
+        //Log.e(TAG, "Partial results");
     }
 
     @Override
     public void onEvent(int eventType, Bundle params) {
-        Log.e(TAG, "Event");
+       // Log.e(TAG, "Event");
     }
 
     @Override
     public void onBufferReceived(byte[] buffer) {
-        Log.e(TAG, "Buffer Received");
+        //Log.e(TAG, "Buffer Received");
     }
 
     @Override
     public void onError(int error) {
-        Log.e(TAG, "Error: " + SpeechRecognitionUtils.getErrorText(error));
+       // Log.e(TAG, "Error: " + SpeechRecognitionUtils.getErrorText(error));
     }
 
     @Override

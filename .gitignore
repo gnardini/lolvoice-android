@@ -28,6 +28,8 @@ proguard/
 # OSX
 .DS_Store
 
+# other
+.idea/
 *.iml
 
 Configuration.java

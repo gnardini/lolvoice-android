@@ -1,8 +1,5 @@
 package com.android.lolvoice.service.providers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.android.lolvoice.service.callback.RequestCallback;
 
 public abstract class ApiPagingProvider<T> {
@@ -20,13 +17,6 @@ public abstract class ApiPagingProvider<T> {
     public final void provide(int items, int page, RequestCallback<T> callback) {
         storeCallData(items, page, callback);
         doCall();
-    }
-
-    public void saveOfflineData(T apiResponse) {
-    }
-
-    public List getOfflineData() {
-        return new ArrayList();
     }
 
     private void storeCallData(int items, int page, RequestCallback<T> callback) {

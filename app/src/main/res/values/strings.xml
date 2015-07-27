@@ -4,24 +4,31 @@
     <string name="app_name">LoL Voice</string>
     <string name="network_error">Network error</string>
 
-    <!-- Summoner Selection -->
-    <string name="new_summoner">Summoner Name:</string>
-    <string name="summoner_name">Summoner</string>
+    <!-- Error Messages -->
     <string name="invalid_name">Invalid Summoner Name</string>
-    <string name="random_summoner">Random Summoner</string>
-    <string name="summoner_selection">Summoner Selection</string>
-    <string name="summoner_selection_loading_game">Loading game ...</string>
-    <string name="summoner_selection_fetching_champion">Fetching champion info ...</string>
     <string name="summoner_selection_not_ranked_game">The summoner is not playing a ranked game
     </string>
+    <string name="no_tts_installed">Text To Speech not available at the moment. Sorry!</string>
 
-    <!-- Current Game -->
-    <string name="talk">Give Command!</string>
-    <string name="speak">Speak Now!</string>
+    <!-- LoL roles -->
     <string name="top">Top</string>
     <string name="jg">Jungle</string>
     <string name="mid">Mid</string>
     <string name="adc">ADC</string>
     <string name="support">Support</string>
+
+    <!-- Summoner Selection -->
+    <string name="new_summoner">Summoner Name:</string>
+    <string name="summoner_name">Summoner</string>
+    <string name="random_summoner">Random Summoner</string>
+    <string name="summoner_selection">Summoner Selection</string>
+    <string name="summoner_selection_loading_game">Loading game</string>
+    <string name="summoner_selection_fetching_champion">Fetching champion info</string>
+
+    <!-- Current Game -->
+    <string name="talk">Give Command!</string>
+    <string name="speak">Speak Now!</string>
+    <string name="current_game_name_spell">Name spell</string>
+    <string name="current_game_name_role">Name role</string>
 
 </resources>

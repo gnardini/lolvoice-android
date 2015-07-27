@@ -38,6 +38,7 @@ public class ChampionsUtils {
     private static boolean sSummonerSpellsLoading;
     private static boolean sChampionsLoaded;
     private static boolean sSummonerSpellsLoaded;
+    private static boolean sResultsSent;
     private static OnFinishLoadingListener sListener;
 
     public static ChampionInfo getChampionById(int id) {
@@ -85,8 +86,10 @@ public class ChampionsUtils {
                 sSummonerSpellsLoaded = true;
             }
         }
-        if (listener != null && sChampions != null && sSummonerSpells != null)
+        if (listener != null && sChampions != null && sSummonerSpells != null) {
             listener.onLoadingSuccess();
+            sResultsSent = true;
+        }
     }
 
     private static void getChampions() {
@@ -96,7 +99,7 @@ public class ChampionsUtils {
             @Override
             public void handle(APIException exception) {
                 sChampionsLoading = false;
-                if (sListener != null) sListener.onLoadingFail();
+                if (sListener != null && !sResultsSent) sListener.onLoadingFail();
             }
 
             @Override
@@ -106,8 +109,13 @@ public class ChampionsUtils {
                 for (Champion champion : champions)
                     sChampions.put((int) champion.getID(), new ChampionInfo(champion));
                 sChampionsLoading = false;
-                if (sListener != null && !sChampionsLoaded && sSummonerSpellsLoaded)
+                if (sListener != null
+                        && !sChampionsLoaded
+                        && sSummonerSpellsLoaded
+                        && !sResultsSent) {
+                    sResultsSent = true;
                     sListener.onLoadingSuccess();
+                }
                 sChampionsLoaded = true;
             }
         });
@@ -120,7 +128,7 @@ public class ChampionsUtils {
             @Override
             public void handle(APIException exception) {
                 sSummonerSpellsLoading = false;
-                if (sListener != null) sListener.onLoadingFail();
+                if (sListener != null && !sResultsSent) sListener.onLoadingFail();
             }
 
             @Override
@@ -130,8 +138,13 @@ public class ChampionsUtils {
                 for (SummonerSpell ss : summonerSpells)
                     sSummonerSpells.put((int) ss.getID(), new SummonerSpellInfo(ss));
                 sSummonerSpellsLoading = false;
-                if (sListener != null && !sSummonerSpellsLoaded && sChampionsLoaded)
+                if (sListener != null
+                        && !sSummonerSpellsLoaded
+                        && sChampionsLoaded
+                        && !sResultsSent) {
+                    sResultsSent = true;
                     sListener.onLoadingSuccess();
+                }
                 sSummonerSpellsLoaded = true;
             }
         });
@@ -145,17 +158,6 @@ public class ChampionsUtils {
             case ADC: return Role.ADC;
             case SUP: return Role.SUP;
             default: return null;
-        }
-    }
-
-    public static int getRolePosition(Role role) {
-        switch (role) {
-            case TOP: return TOP;
-            case JG: return JG;
-            case MID: return MID;
-            case ADC: return ADC;
-            case SUP: return SUP;
-            default: return -1;
         }
     }
 

@@ -105,16 +105,9 @@ public class CurrentGameFragment extends BaseFragment {
                 } else {
                     int newSelected = (int) v.getTag();
                     if (newSelected != mSelectedRole) {
-                        ChampionPortrait portrait1 = mChampionPortraits.get(mSelectedRole);
-                        ChampionPortrait portrait2 = mChampionPortraits.get(newSelected);
-                        ChampionInfo champion = portrait1.mChampion;
-                        Participant participant = portrait1.mParticipant;
-                        portrait1.mChampion = portrait2.mChampion;
-                        portrait1.mParticipant = portrait2.mParticipant;
-                        portrait2.mChampion = champion;
-                        portrait2.mParticipant = participant;
-                        loadChampionData(portrait1);
-                        loadChampionData(portrait2);
+                        swapChampions(
+                                mChampionPortraits.get(mSelectedRole),
+                                mChampionPortraits.get(newSelected));
                     }
                     mChampionPortraits.get(mSelectedRole).mFrame.setSelected(false);
                     mSelectedRole = null;
@@ -123,6 +116,23 @@ public class CurrentGameFragment extends BaseFragment {
         };
         for (ChampionPortrait portrait : mChampionPortraits)
             portrait.mFrame.setOnClickListener(listener);
+    }
+
+    private void swapChampions(ChampionPortrait selectedPortrait, ChampionPortrait newPortrait) {
+        ChampionInfo champion = selectedPortrait.mChampion;
+        Participant participant = selectedPortrait.mParticipant;
+        SummonerSpellInfo summonerSpell1 = selectedPortrait.mSummonerSpell1;
+        SummonerSpellInfo summonerSpell2 = selectedPortrait.mSummonerSpell2;
+        selectedPortrait.mChampion = newPortrait.mChampion;
+        selectedPortrait.mParticipant = newPortrait.mParticipant;
+        selectedPortrait.mSummonerSpell1 = newPortrait.mSummonerSpell1;
+        selectedPortrait.mSummonerSpell2 = newPortrait.mSummonerSpell2;
+        newPortrait.mChampion = champion;
+        newPortrait.mParticipant = participant;
+        newPortrait.mSummonerSpell1 = summonerSpell1;
+        newPortrait.mSummonerSpell2 = summonerSpell2;
+        loadChampionData(selectedPortrait);
+        loadChampionData(newPortrait);
     }
 
     private void loadChampionImages(final List<Participant> players) {
@@ -142,22 +152,25 @@ public class CurrentGameFragment extends BaseFragment {
 
     private void loadChampionData(ChampionPortrait portrait) {
         Participant player = portrait.mParticipant;
-        if (portrait.mChampion == null) {
-            return;
+        if (portrait.mChampion != null) {
+            portrait.mChampionImage.setImageURI(Uri.parse(Configuration.IMAGES_URL
+                    + portrait.mChampion.getImageGroup() + "/"
+                    + portrait.mChampion.getImageFull()));
         }
-        portrait.mChampionImage.setImageURI(Uri.parse(Configuration.IMAGES_URL
-                + portrait.mChampion.getImageGroup() + "/"
-                + portrait.mChampion.getImageFull()));
         portrait.mSummonerSpell1 =
                 ChampionsUtils.getSummonerSpellById((int) (long) player.getSpell1Id());
-        portrait.mSpell1.setImageURI(Uri.parse(Configuration.IMAGES_URL
-                + portrait.mSummonerSpell1.getImageGroup() + "/"
-                + portrait.mSummonerSpell1.getImageFull()));
+        if (portrait.mSummonerSpell1 != null) {
+            portrait.mSpell1.setImageURI(Uri.parse(Configuration.IMAGES_URL
+                    + portrait.mSummonerSpell1.getImageGroup() + "/"
+                    + portrait.mSummonerSpell1.getImageFull()));
+        }
         portrait.mSummonerSpell2 =
                 ChampionsUtils.getSummonerSpellById((int) (long) player.getSpell2Id());
-        portrait.mSpell2.setImageURI(Uri.parse(Configuration.IMAGES_URL
-                + portrait.mSummonerSpell2.getImageGroup() + "/"
-                + portrait.mSummonerSpell2.getImageFull()));
+        if (portrait.mSummonerSpell2 != null) {
+            portrait.mSpell2.setImageURI(Uri.parse(Configuration.IMAGES_URL
+                    + portrait.mSummonerSpell2.getImageGroup() + "/"
+                    + portrait.mSummonerSpell2.getImageFull()));
+        }
     }
 
     private void startCooldownTracking() {
@@ -172,11 +185,14 @@ public class CurrentGameFragment extends BaseFragment {
     }
 
     public void requestRole() {
-        EventBus.getDefault().post(new SpeakEvent("Name role"));
+        EventBus.getDefault().post(new SpeakEvent(R.string.current_game_name_role));
+
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         getActivity().startActivityForResult(intent, CurrentGameActivity.REQUEST_ROLE);
+
+       // startListening();
     }
 
     public void onRoleSelected(Role role) {
@@ -188,7 +204,7 @@ public class CurrentGameFragment extends BaseFragment {
     }
 
     public void requestSpell() {
-        EventBus.getDefault().post(new SpeakEvent("Name spell"));
+        EventBus.getDefault().post(new SpeakEvent(R.string.current_game_name_spell));
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);

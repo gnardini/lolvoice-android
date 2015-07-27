@@ -11,6 +11,7 @@ public class SpeechRecognitionUtils {
 
     public static Role getRole(List<String> results) {
         for (String result : results) {
+            //Log.e("Result: ", result);
             for (Role role : Role.values()) {
                 for (String name : role.getNames())
                     if (result.contains(name)) return role;
@@ -21,6 +22,7 @@ public class SpeechRecognitionUtils {
 
     public static Spell getSpell(List<String> results) {
         for (String result : results) {
+            //Log.e("Result: ", result);
             for (Spell spell : Spell.values()) {
                 for (String name : spell.getNames())
                     if (result.contains(name)) return spell;

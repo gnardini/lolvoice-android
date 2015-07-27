@@ -74,7 +74,6 @@ public class CurrentGameUtils {
             public void onLoadingSuccess() {
                 sLoadingGame = false;
                 listener.onChampionInfoLoaded();
-                context.startActivity(new Intent(context, CurrentGameActivity.class));
             }
 
             @Override

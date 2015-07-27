@@ -1,14 +1,17 @@
 package com.android.lolvoice.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.lolvoice.R;
+import com.android.lolvoice.activities.CurrentGameActivity;
 import com.android.lolvoice.adapters.SummonersAdapter;
 import com.android.lolvoice.listeners.CurrentGameLoadingListener;
 import com.android.lolvoice.models.SummonerInfo;
@@ -28,11 +31,19 @@ import butterknife.OnClick;
 
 public class SummonerSelectionFragment extends BaseFragment implements CurrentGameLoadingListener {
 
-    @Bind(R.id.summoner_selection_toolbar) Toolbar mToolbar;
-    @Bind(R.id.summoner_selection_new) EditText mNewSummoner;
-    @Bind(R.id.summoner_selection_listview) ListView mSummoners;
-    @Bind(R.id.summoner_selection_loading) View mLoading;
-    @Bind(R.id.summoner_selection_loading_text) TextView mLoadingText;
+    @Bind(R.id.summoner_selection_toolbar)
+    Toolbar mToolbar;
+    @Bind(R.id.summoner_selection_new)
+    EditText mNewSummoner;
+    @Bind(R.id.summoner_selection_listview)
+    ListView mSummoners;
+    @Bind(R.id.summoner_selection_loading)
+    View mLoading;
+    @Bind(R.id.summoner_selection_loading_text)
+    TextView mLoadingText;
+    /*
+    @Bind(R.id.summoner_selection_region)
+    Spinner mRegion;*/
     private SummonersAdapter mSummonerAdapter;
     private List<SummonerInfo> mSummonersList;
     private boolean mStartGameOnLoad;
@@ -59,6 +70,12 @@ public class SummonerSelectionFragment extends BaseFragment implements CurrentGa
         mSummonersList = new LinkedList<>(SummonerUtils.getStoredSummoners());
         mSummonerAdapter = new SummonersAdapter(getActivity(), mSummonersList);
         mSummoners.setAdapter(mSummonerAdapter);
+        /*
+        RegionsAdapter regionsAdapter = new RegionsAdapter(getActivity(),
+                android.R.layout.simple_spinner_item, Region.values());
+        regionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mRegion.setAdapter(regionsAdapter);
+        */
     }
 
     @Override
@@ -151,6 +168,7 @@ public class SummonerSelectionFragment extends BaseFragment implements CurrentGa
                 mLoading.setVisibility(View.GONE);
             }
         });
+        getActivity().startActivity(new Intent(getActivity(), CurrentGameActivity.class));
     }
 
     @Override

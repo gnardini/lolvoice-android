@@ -1,6 +1,5 @@
 package com.android.lolvoice.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Build;
@@ -8,11 +7,13 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 
 import com.android.lolvoice.models.event.SpeakEvent;
+import com.android.lolvoice.utils.ScreenLockUtils;
 
 import java.util.Locale;
 
 import de.greenrobot.event.EventBus;
 
+// deprecated, not currently being used.
 public abstract class TTSActivity extends BaseActivity implements TextToSpeech.OnInitListener {
 
     private static final int DATA_CHECK = 5;
@@ -36,6 +37,8 @@ public abstract class TTSActivity extends BaseActivity implements TextToSpeech.O
     }
 
     public void onEvent(SpeakEvent event) {
+        if (!ScreenLockUtils.isScrenOn(getApplicationContext()))
+            ScreenLockUtils.wakeScreen(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             mTextToSpeech.speak(event.getText(), TextToSpeech.QUEUE_FLUSH, null, null);
         else mTextToSpeech.speak(event.getText(), TextToSpeech.QUEUE_FLUSH, null);

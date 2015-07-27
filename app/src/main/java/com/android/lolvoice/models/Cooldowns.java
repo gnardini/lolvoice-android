@@ -1,7 +1,5 @@
 package com.android.lolvoice.models;
 
-import android.util.Log;
-
 import com.android.lolvoice.models.event.SpeakEvent;
 
 import de.greenrobot.event.EventBus;
