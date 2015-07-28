@@ -13,7 +13,7 @@
         android:name=".LoLVoiceApplication"
         android:allowBackup="true"
         tools:replace="android:icon"
-        android:icon="@drawable/icon_send"
+        android:icon="@drawable/lv_icon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
